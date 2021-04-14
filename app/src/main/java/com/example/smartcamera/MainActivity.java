@@ -24,6 +24,8 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -42,11 +44,12 @@ public class MainActivity extends AppCompatActivity {
     @BindView(R.id.share_button) FloatingActionButton mShareFab;
     @BindView(R.id.save_button) FloatingActionButton mSaveFab;
     @BindView(R.id.clear_button) FloatingActionButton mClearFab;
-
+    @BindView(R.id.logo) ImageView mLogo;
 
     private String mTempPhotoPath;
 
     private Bitmap mResultsBitmap;
+    private Window window;
 
     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     @Override
@@ -56,16 +59,30 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        Window window  = MainActivity.this.getWindow();
+         window  = MainActivity.this.getWindow();
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                window.setStatusBarColor(getColor(R.color.transparent));
+                window.setStatusBarColor(getColor(R.color.primary));
             }
         }
 
 
-        emojifyMe();
+        Timer t = new Timer(false);
+        t.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                runOnUiThread(new Runnable() {
+                    public void run() {
+                        mLogo.setVisibility(View.INVISIBLE);
+                        emojifyMe();
+
+                    }
+                });
+            }
+        }, 1000);
+
+
 
         // Bind the views
         ButterKnife.bind(this);
@@ -168,6 +185,14 @@ public class MainActivity extends AppCompatActivity {
 
         // Set the new bitmap to the ImageView
         mImageView.setImageBitmap(mResultsBitmap);
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                window.setStatusBarColor(getColor(R.color.transparent));
+            }
+        }
+
+
     }
 
 
@@ -204,15 +229,22 @@ public class MainActivity extends AppCompatActivity {
     @OnClick(R.id.clear_button)
     public void clearImage() {
         // Clear the image and toggle the view visibility
+        emojifyMe();
         mImageView.setImageResource(0);
         mShareFab.setVisibility(View.GONE);
         mSaveFab.setVisibility(View.GONE);
         mClearFab.setVisibility(View.GONE);
+        mLogo.setVisibility(View.VISIBLE);
 
         // Delete the temporary image file
         BitmapUtils.deleteImageFile(this, mTempPhotoPath);
 
-        emojifyMe();
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                window.setStatusBarColor(getColor(R.color.primary));
+            }
+        }
+
     }
 
     public void emojifyMe() {
