@@ -11,6 +11,7 @@ import android.provider.MediaStore;
 import android.view.View;
 import android.view.Window;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -43,6 +44,7 @@ public class MainActivity extends AppCompatActivity {
     @BindView(R.id.save_button) ImageView mSaveFab;
     @BindView(R.id.clear_button) ImageView mClearFab;
     @BindView(R.id.logo) ImageView mLogo;
+    @BindView(R.id.buttons_layout) LinearLayout mLinearLayout;
 
     private String mTempPhotoPath;
 
@@ -174,6 +176,7 @@ public class MainActivity extends AppCompatActivity {
     private void processAndSetImage() throws IOException {
 
         // Toggle Visibility of the views
+        mLinearLayout.setVisibility(View.VISIBLE);
         mSaveFab.setVisibility(View.VISIBLE);
         mShareFab.setVisibility(View.VISIBLE);
         mClearFab.setVisibility(View.VISIBLE);
@@ -234,6 +237,7 @@ public class MainActivity extends AppCompatActivity {
         // Clear the image and toggle the view visibility
         emojifyMe();
         mImageView.setImageResource(0);
+        mLinearLayout.setVisibility(View.VISIBLE);
         mShareFab.setVisibility(View.GONE);
         mSaveFab.setVisibility(View.GONE);
         mClearFab.setVisibility(View.GONE);
