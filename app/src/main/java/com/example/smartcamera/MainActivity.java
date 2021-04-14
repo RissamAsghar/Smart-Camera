@@ -156,7 +156,11 @@ public class MainActivity extends AppCompatActivity {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK) {
             // Process the image and set it to the TextView
-            processAndSetImage();
+            try {
+                processAndSetImage();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         } else {
 
             // Otherwise, delete the temporary image file
@@ -167,7 +171,7 @@ public class MainActivity extends AppCompatActivity {
     /**
      * Method for processing the captured image and setting it to the TextView.
      */
-    private void processAndSetImage() {
+    private void processAndSetImage() throws IOException {
 
         // Toggle Visibility of the views
         mSaveFab.setVisibility(View.VISIBLE);

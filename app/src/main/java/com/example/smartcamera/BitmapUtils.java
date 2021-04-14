@@ -22,8 +22,6 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Environment;
-import android.util.DisplayMetrics;
-import android.view.WindowManager;
 import android.widget.Toast;
 
 import androidx.core.content.FileProvider;
@@ -40,7 +38,6 @@ class BitmapUtils {
 
     private static final String FILE_PROVIDER_AUTHORITY = "com.example.android.fileprovider";
 
-
     /**
      * Resamples the captured photo to fit the screen for better memory usage.
      *
@@ -48,31 +45,15 @@ class BitmapUtils {
      * @param imagePath The path of the photo to be resampled.
      * @return The resampled bitmap
      */
-    static Bitmap resamplePic(Context context, String imagePath) {
+    static Bitmap resamplePic(Context context, String imagePath) throws IOException {
 
-        // Get device screen size information
-        DisplayMetrics metrics = new DisplayMetrics();
-        WindowManager manager = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
-        manager.getDefaultDisplay().getMetrics(metrics);
+        Bitmap bitmap =  BitmapFactory.decodeFile(imagePath);
+        Bitmap orientedBitmap = ExifUtil.rotateBitmap(imagePath, bitmap);
 
-        int targetH = metrics.heightPixels;
-        int targetW = metrics.widthPixels;
+        Bitmap convertImage = getResizedBitmap(orientedBitmap, 1920);
 
-        // Get the dimensions of the original bitmap
-        BitmapFactory.Options bmOptions = new BitmapFactory.Options();
-        bmOptions.inJustDecodeBounds = true;
-        BitmapFactory.decodeFile(imagePath, bmOptions);
-        int photoW = bmOptions.outWidth;
-        int photoH = bmOptions.outHeight;
-
-        // Determine how much to scale down the image
-        int scaleFactor = Math.min(photoW / targetW, photoH / targetH);
-
-        // Decode the image file into a Bitmap sized to fill the View
-        bmOptions.inJustDecodeBounds = false;
-        bmOptions.inSampleSize = scaleFactor;
-
-        return BitmapFactory.decodeFile(imagePath);
+        //bitmap = rotateImageIfRequired(context, bitmap, );
+        return convertImage;
     }
 
     /**
@@ -160,7 +141,7 @@ class BitmapUtils {
             savedImagePath = imageFile.getAbsolutePath();
             try {
                 OutputStream fOut = new FileOutputStream(imageFile);
-                image.compress(Bitmap.CompressFormat.JPEG, 100, fOut);
+                image.compress(Bitmap.CompressFormat.JPEG, 75, fOut);
                 fOut.close();
             } catch (Exception e) {
                 e.printStackTrace();
@@ -170,7 +151,7 @@ class BitmapUtils {
             galleryAddPic(context, savedImagePath);
 
             // Show a Toast with the save location
-            String savedMessage = context.getString(R.string.saved_message, savedImagePath);
+            String savedMessage = context.getString(R.string.saved_message);
             Toast.makeText(context, savedMessage, Toast.LENGTH_SHORT).show();
         }
 
@@ -192,4 +173,20 @@ class BitmapUtils {
         shareIntent.putExtra(Intent.EXTRA_STREAM, photoURI);
         context.startActivity(shareIntent);
     }
+
+    public static Bitmap getResizedBitmap(Bitmap image, int maxSize) {
+        int width = image.getWidth();
+        int height = image.getHeight();
+
+        float bitmapRatio = (float)width / (float) height;
+        if (bitmapRatio > 1) {
+            width = maxSize;
+            height = (int) (width / bitmapRatio);
+        } else {
+            height = maxSize;
+            width = (int) (height * bitmapRatio);
+        }
+        return Bitmap.createScaledBitmap(image, width, height, true);
+    }
+
 }
