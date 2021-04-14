@@ -20,8 +20,6 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.core.content.FileProvider;
 
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
-
 import java.io.File;
 import java.io.IOException;
 import java.util.Timer;
@@ -41,9 +39,9 @@ public class MainActivity extends AppCompatActivity {
 
     @BindView(R.id.image_view) ImageView mImageView;
 
-    @BindView(R.id.share_button) FloatingActionButton mShareFab;
-    @BindView(R.id.save_button) FloatingActionButton mSaveFab;
-    @BindView(R.id.clear_button) FloatingActionButton mClearFab;
+    @BindView(R.id.share_button) ImageView mShareFab;
+    @BindView(R.id.save_button) ImageView mSaveFab;
+    @BindView(R.id.clear_button) ImageView mClearFab;
     @BindView(R.id.logo) ImageView mLogo;
 
     private String mTempPhotoPath;
@@ -183,8 +181,9 @@ public class MainActivity extends AppCompatActivity {
         // Detect the faces and overlay the appropriate emoji
         mResultsBitmap = Emojifier.detectFacesandOverlayEmoji(this, mResultsBitmap);
 
+
         // Set the new bitmap to the ImageView
-        mImageView.setImageBitmap(mResultsBitmap);
+       mImageView.setImageBitmap(mResultsBitmap);
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
